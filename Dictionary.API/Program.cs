@@ -1,4 +1,5 @@
 using System.Text;
+using Dictionary.Application;
 using Dictionary.Application.Options;
 using Dictionary.Application.Services.ParseServices;
 using Dictionary.Data.Contexts;
@@ -26,6 +27,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.Configure<ParserOptions>(builder.Configuration.GetSection("ParserOptions"));
+builder.Services.AddRepositories();
+
 builder.Services.AddHostedService<ParserService>();
 
 var app = builder.Build();

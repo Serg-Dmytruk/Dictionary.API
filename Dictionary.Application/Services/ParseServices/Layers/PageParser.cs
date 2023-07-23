@@ -23,7 +23,7 @@ public abstract class PageParser
     
     protected IEnumerable<Task<IEnumerable<ParseResult>>> CteateChildParsers(IEnumerable<string?> hrefs)
     {
-        return (from href in hrefs
+        return (from href in hrefs.Take(2)
             let childParser = ParserFactory.CreatePageParser(_layer + 1, BaseUrl, Logger)
             where !string.IsNullOrEmpty(href)
             select childParser.ParseAsync(href)).ToList();

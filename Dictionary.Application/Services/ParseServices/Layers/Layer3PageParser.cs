@@ -7,7 +7,7 @@ namespace Dictionary.Application.Services.ParseServices.Layers;
 //рівень слова в розділі
 public class Layer3PageParser : PageParser
 {
-    private static readonly SemaphoreSlim Semaphore = new SemaphoreSlim(1);
+    private static readonly SemaphoreSlim Semaphore = new(1);
     public Layer3PageParser(int layer, string baseUrl, ILogger logger) : base(layer, baseUrl, logger)
     {
     }
@@ -32,6 +32,7 @@ public class Layer3PageParser : PageParser
             var childParseTasks = CteateChildParsers(hrefs);
             var childParseResults = await Task.WhenAll(childParseTasks);
             Semaphore.Release();
+            
             var parseResult = new List<ParseResult>();
             foreach (var result in childParseResults)
             {

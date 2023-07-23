@@ -2,31 +2,43 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Data.SqlClient;
+using System.Text.Json;
 using Dapper;
+using Dictionary.Data.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Npgsql;
 
 namespace Dictionary.Application.Repositories;
 
-public class DictionaryRepository
+public class DictionaryRepository : DefaultRepository
 {
     private readonly string? _connectionString;
-    private readonly ApplicationDbContext _db;
-    private readonly ILogger<DictionaryRepository> _logger;
+    
 
-    public DictionaryRepository(IConfiguration configuration, ApplicationDbContext db, ILogger<DictionaryRepository> logger)
+    public DictionaryRepository(IConfiguration configuration, ILogger<DictionaryRepository> logger) : base(logger)
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
-        _db = db;
-        _logger = logger;
     }
-
-    //TODO
-    public async Task<List<TReturn>> GetUniqueRecords<T, TReturn>(IEnumerable<T> logs, string table)
-        where T : class
+    
+    public async Task AddRelations(DbContext context, IDbContextTransaction transaction)
     {
-        await using var connection = new SqlConnection (_connectionString);
-        await connection.OpenAsync();
-        var query = "";
         
-        return (await connection.QueryAsync<TReturn>(query)).ToList();
+    }
+    
+    public async Task<List<string>> GetUniqueRecords(IEnumerable<Word> words)
+        
+    {
+        await using var connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
+        
+        var json = JsonSerializer.Serialize(words);
+        var query = $@"SELECT *
+        FROM JSONB_TO_RECORDSET('{json}') AS t(""Value"" text)
+        WHERE NOT EXISTS (
+                SELECT 1 FROM words AS w 
+                    WHERE t.""Value"" = w.value)";
+        
+        return (await connection.QueryAsync<string>(query)).ToList();
     }
 }

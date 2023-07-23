@@ -5,14 +5,15 @@
         public string? Source { get; set; }
         public string EnWord { get; set; }
         public string? LanguagePart { get; set; }
-        public List<PosibleTranslation> PosibleTranslations = new();
+        
+        public List<Translation> PosibleTranslations = new();
         public IEnumerable<string> RelatedWords { get; set; }
     }
 
-    public class PosibleTranslation
+    public class Translation
     {
         public string? Explanation { get; set; }
-        public string? Translation { get; set; }
+        public string? Interpretation { get; set; }
         public string? Example { get; set; }
     }
 }

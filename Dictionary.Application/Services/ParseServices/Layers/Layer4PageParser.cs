@@ -33,10 +33,10 @@ public class Layer4PageParser : PageParser
         var divPosibleTanslations = document.QuerySelectorAll(".def-block.ddef_block");
         foreach (var div in divPosibleTanslations)
         {
-            parseResult.PosibleTranslations.Add(new PosibleTranslation
+            parseResult.PosibleTranslations.Add(new Translation
             {
                 Explanation = div.QuerySelector(".def.ddef_d.db")?.TextContent,
-                Translation = div.QuerySelector(".trans.dtrans")?.TextContent,
+                Interpretation = div.QuerySelector(".trans.dtrans")?.TextContent,
                 Example = div.QuerySelector(".eg.deg")?.TextContent
             });
         }
