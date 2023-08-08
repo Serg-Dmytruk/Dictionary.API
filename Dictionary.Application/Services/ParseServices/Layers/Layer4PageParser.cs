@@ -43,7 +43,7 @@ public class Layer4PageParser : PageParser
 
         var elementRelatedWords = document.QuerySelectorAll(".phrase");
         parseResult.RelatedWords = elementRelatedWords.Select(x => x.TextContent).ToList();
-
+        
         return new List<ParseResult> { parseResult };
     }
 }

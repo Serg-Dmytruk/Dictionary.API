@@ -16,34 +16,40 @@ public class Layer3PageParser : PageParser
     {
         try
         {
+            await Semaphore.WaitAsync();
             using var context = BrowsingContext.New(Config);
             using var document = await context.OpenAsync(url);
 
             var div = document.QuerySelector(".hdf.ff-50.lmt-15.i-browse");
 
             if (div is null)
+            {
+                Semaphore.Release();
                 return Enumerable.Empty<ParseResult>();
-           
+            }
+
             var links = div.QuerySelectorAll("a");
             var hrefs = links.Select(a =>
                 a.GetAttribute("href"));
 
-            await Semaphore.WaitAsync();
+            context.Dispose();
+            document.Dispose();
+            
             var childParseTasks = CteateChildParsers(hrefs);
             var childParseResults = await Task.WhenAll(childParseTasks);
-            Semaphore.Release();
             
             var parseResult = new List<ParseResult>();
             foreach (var result in childParseResults)
             {
                 parseResult.AddRange(result);
             }
-
+            
+            Semaphore.Release();
             return parseResult;
         }
         catch (Exception e)
         {
-            Logger.LogWarning(e, "error ocured {Url}", url);
+            Logger.LogWarning(e, "error ocured Layer3PageParser {Url}", url);
             return Enumerable.Empty<ParseResult>();
         }
     }
