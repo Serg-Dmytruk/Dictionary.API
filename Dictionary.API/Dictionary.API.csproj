@@ -16,10 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Dictionary.Application\Dictionary.Application.csproj" />
       <ProjectReference Include="..\Dictionary.Contacts\Dictionary.Contacts.csproj" />
     </ItemGroup>

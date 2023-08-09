@@ -17,6 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Dictionary.Contacts\Dictionary.Contacts.csproj" />
       <ProjectReference Include="..\Dictionary.Data\Dictionary.Data.csproj" />
     </ItemGroup>
 

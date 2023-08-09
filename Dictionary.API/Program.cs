@@ -2,8 +2,7 @@ using System.Text;
 using Dictionary.Application;
 using Dictionary.Application.Options;
 using Dictionary.Application.Services.ParseServices;
-using Dictionary.Data.Contexts;
-using Microsoft.EntityFrameworkCore;
+using Dictionary.Data;
 using Serilog;
 using Serilog.Events;
 
@@ -18,18 +17,16 @@ var logger = new LoggerConfiguration().WriteTo.Console(LogEventLevel.Warning)
 
 // Add services to the container.
 builder.Logging.AddSerilog(logger);
-
-var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(defaultConnection).UseSnakeCaseNamingConvention());
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.Configure<ParserOptions>(builder.Configuration.GetSection("ParserOptions"));
-builder.Services.AddRepositories();
 
+builder.Services.AddDatabase(builder.Configuration.GetConnectionString("DefaultConnection")!);
+builder.Services.AddRepositories();
+builder.Services.AddServices();
 builder.Services.AddHostedService<ParserService>();
+
+builder.Services.Configure<ParserOptions>(builder.Configuration.GetSection("ParserOptions"));
 
 var app = builder.Build();
 
@@ -44,5 +41,9 @@ Console.OutputEncoding = Encoding.UTF8;
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+await using var scope = app.Services.CreateAsyncScope();
+var dbInitializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
+await dbInitializer.InitializeAsync();
 
 app.Run();

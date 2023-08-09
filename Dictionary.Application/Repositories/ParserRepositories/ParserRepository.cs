@@ -1,21 +1,17 @@
 ﻿using System.Data;
 using System.Data.Common;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using Dapper;
 using Dictionary.Data.Models;
-using Npgsql;
+using Microsoft.Extensions.Logging;
 
-namespace Dictionary.Application.Repositories;
+namespace Dictionary.Application.Repositories.ParserRepositories;
 
-public class DictionaryRepository : DefaultRepository
+public class ParserRepository : EfCoreDefaultRepository, IParserRepository
 {
-    private readonly string? _connectionString;
-    
-    public DictionaryRepository(IConfiguration configuration, ILogger<DictionaryRepository> logger) : base(logger)
+
+    public ParserRepository(ILogger<ParserRepository> logger) : base(logger)
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
 
     public async Task AddRelations(string json, DbConnection connection, IDbTransaction? transaction)

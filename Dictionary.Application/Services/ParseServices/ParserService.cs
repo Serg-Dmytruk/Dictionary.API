@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Dictionary.Application.Options;
 using Dictionary.Application.Repositories;
+using Dictionary.Application.Repositories.ParserRepositories;
 using Dictionary.Application.Services.ParseServices.Factories;
 using Dictionary.Data.Contexts;
 using Dictionary.Data.Models;
@@ -34,6 +35,9 @@ namespace Dictionary.Application.Services.ParseServices
         {
             try
             {
+                if (!_options.Value.StartParse)
+                    return;
+                    
                 _parseLogger.LogWarning("Start parse");
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
@@ -71,7 +75,7 @@ namespace Dictionary.Application.Services.ParseServices
                 var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 
                 await using var transaction = await db.Database.BeginTransactionAsync(stoppingToken);
-                var dictionaryRepository = scope.ServiceProvider.GetRequiredService<DictionaryRepository>();
+                var dictionaryRepository = scope.ServiceProvider.GetRequiredService<IParserRepository>();
                 
                 //вибераємо на добавлення в базу ті слова яких нема в базі
                 var uniqueWords = await dictionaryRepository.GetUniqueRecords(dictionary, db.Database.GetDbConnection(), db.Database.CurrentTransaction?.GetDbTransaction());

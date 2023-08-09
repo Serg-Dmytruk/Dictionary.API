@@ -3,17 +3,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Dictionary.Application.Repositories;
 
-public class DefaultRepository
+public class EfCoreDefaultRepository : IEfCoreDefaultRepository
 {
-    private readonly ILogger<DefaultRepository> _logger;
+    private readonly ILogger<EfCoreDefaultRepository> _logger;
 
-    protected DefaultRepository(ILogger<DefaultRepository> logger)
+    protected EfCoreDefaultRepository(ILogger<EfCoreDefaultRepository> logger)
     {
         _logger = logger;
     }
 
-    public async Task AddRangeAsync<TEntity>(DbContext context, IEnumerable<TEntity> collection)
-        where TEntity : class
+    public async Task AddRangeAsync<TEntity>(DbContext context, IEnumerable<TEntity> collection) where TEntity : class
     {
         try
         {

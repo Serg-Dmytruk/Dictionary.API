@@ -2,6 +2,6 @@
 
 public class ParserOptions
 {
-    public bool IsOneTimeParser { get; set; }
+    public bool StartParse { get; set; }
     public string BaseUrl { get; set; }
 }
