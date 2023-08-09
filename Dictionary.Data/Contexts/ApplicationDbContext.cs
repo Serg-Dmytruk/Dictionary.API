@@ -7,10 +7,10 @@ namespace Dictionary.Data.Contexts;
 
 public class ApplicationDbContext : DbContext
 {
-    public virtual DbSet<Word> Words { get; set; }
-    public virtual DbSet<Relation> Relations { get; set; }
-    public virtual DbSet<PossibleTranslation> PossibleTranslations { get; set; }
-    
+    public virtual DbSet<Word> Words { get; set; } = null!;
+    public virtual DbSet<Relation> Relations { get; set; } = null!;
+    public virtual DbSet<PossibleTranslation> PossibleTranslations { get; set; } = null!;
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {

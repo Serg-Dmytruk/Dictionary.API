@@ -31,9 +31,6 @@ public class Layer3PageParser : PageParser
             var links = div.QuerySelectorAll("a");
             var hrefs = links.Select(a =>
                 a.GetAttribute("href"));
-
-            context.Dispose();
-            document.Dispose();
             
             var childParseTasks = CteateChildParsers(hrefs);
             var childParseResults = await Task.WhenAll(childParseTasks);

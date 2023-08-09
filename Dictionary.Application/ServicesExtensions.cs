@@ -1,4 +1,5 @@
-﻿using Dictionary.Application.Repositories.ParserRepositories;
+﻿using Dictionary.Application.Repositories.DictionaryRepositories;
+using Dictionary.Application.Repositories.ParserRepositories;
 using Dictionary.Application.Services.DictionaryServices;
 using Dictionary.Data;
 using Dictionary.Data.Contexts;
@@ -20,6 +21,7 @@ public static class ServicesExtensions
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IParserRepository, ParserRepository>();
+        services.AddScoped<IDictionaryRepository, DictionaryRepository>();
         
         return services;
     }
@@ -28,7 +30,7 @@ public static class ServicesExtensions
     {
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention());
-        services.AddSingleton<IDbConnectionFactory>(_ => new NpsqlConnectionFacroty(connectionString));
+        services.AddSingleton<IDbConnectionFactory>(_ => new NpgsqlConnectionFacrory(connectionString));
         services.AddScoped<DbInitializer>();
         
         return services;

@@ -2,13 +2,11 @@
 
 public class WordResponse
 {
-    public int Id { get; set; }
-    public string Value { get; set; }
+    public string Value { get; set; } = null!;
     public List<PossibleTranslationResponse>? PossibleTranslations { get; set; }
-    public virtual List<WordResponse>? RelatedWords { get; set; }
-    public virtual List<WordResponse>? RelatedFromWords { get; set; }
+    public virtual List<string>? RelatedWords { get; set; }
+    public virtual List<string>? RelatedFromWords { get; set; }
 }
-
 
 public class PossibleTranslationResponse
 {

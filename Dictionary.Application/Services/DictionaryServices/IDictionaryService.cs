@@ -1,6 +1,8 @@
-﻿namespace Dictionary.Application.Services.DictionaryServices;
+﻿using Dictionary.Application.Models.Dictionaries;
+
+namespace Dictionary.Application.Services.DictionaryServices;
 
 public interface IDictionaryService
 {
-    /*Task<Word?> GetWordAsync(string request);*/
+    Task<Models.Dictionaries.WordOut?> GetWordAsync(string request, CancellationToken cancellationToken);
 }

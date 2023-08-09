@@ -7,6 +7,6 @@ public static class ApiEndpoints
     public static class Dictionary
     {
         private const string Base = $"{ApiBase}/dictionaries";
-        public const string Get = $"{Base}/{{request::string}}";
+        public const string Get = $"{Base}/{{request}}";
     }
 }

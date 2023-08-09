@@ -3,11 +3,11 @@ using Npgsql;
 
 namespace Dictionary.Data.DbConnectionFactories;
 
-public class NpsqlConnectionFacroty : IDbConnectionFactory
+public class NpgsqlConnectionFacrory : IDbConnectionFactory
 {
     private readonly string _connectionString;
 
-    public NpsqlConnectionFacroty(string connectionString)
+    public NpgsqlConnectionFacrory(string connectionString)
     {
         _connectionString = connectionString;
     }

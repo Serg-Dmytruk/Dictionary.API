@@ -7,5 +7,5 @@ public class PossibleTranslation
     public string? Explanation { get; set; }
     public string? Translation { get; set; }
     public string? Example { get; set; }
-    public Word Word { get; set; }
+    public Word Word { get; set; } = null!;
 }
