@@ -10,6 +10,7 @@ public class ApplicationDbContext : DbContext
     public virtual DbSet<Word> Words { get; set; } = null!;
     public virtual DbSet<Relation> Relations { get; set; } = null!;
     public virtual DbSet<PossibleTranslation> PossibleTranslations { get; set; } = null!;
+    public virtual DbSet<Example> Examples { get; set; } = null!;
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -36,6 +37,7 @@ public class ApplicationDbContext : DbContext
         builder.ApplyConfiguration(new PossibleTranslationConfiguration());
         builder.ApplyConfiguration(new WordConfiguration());
         builder.ApplyConfiguration(new RelatedWordsConfiguration());
+        builder.ApplyConfiguration(new ExampleConfiguration());
     }
 
 }

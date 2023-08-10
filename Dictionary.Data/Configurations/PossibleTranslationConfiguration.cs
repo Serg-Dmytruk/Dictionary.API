@@ -9,7 +9,6 @@ public class PossibleTranslationConfiguration : IEntityTypeConfiguration<Possibl
     public void Configure(EntityTypeBuilder<PossibleTranslation> builder)
     {
         builder.HasKey(x => x.Id);
-        builder.HasIndex(x => x.Example);
         builder.HasIndex(x => x.Explanation);
         builder.HasIndex(x => x.Translation);
     }

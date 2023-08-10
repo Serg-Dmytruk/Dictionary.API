@@ -18,7 +18,7 @@ public class DictionaryController : ControllerBase
     {
         var response = await _dictionaryService.GetWordAsync(request, cancellationToken);
 
-        if (response is null)
+        if (!response.Any())
             return NotFound();
         
         return Ok(response.MapToWordResponse());

@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Dictionary.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230716134742_Initial")]
+    [Migration("20230810085105_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -24,7 +24,7 @@ namespace Dictionary.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Dictionary.Data.Models.PossibleTranslation", b =>
+            modelBuilder.Entity("Dictionary.Data.Models.Example", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,9 +33,35 @@ namespace Dictionary.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Example")
+                    b.Property<int>("PossibleTranslationId")
+                        .HasColumnType("integer")
+                        .HasColumnName("possible_translation_id");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("example");
+                        .HasColumnName("value");
+
+                    b.HasKey("Id")
+                        .HasName("pk_examples");
+
+                    b.HasIndex("PossibleTranslationId")
+                        .HasDatabaseName("ix_examples_possible_translation_id");
+
+                    b.HasIndex("Value")
+                        .HasDatabaseName("ix_examples_value");
+
+                    b.ToTable("examples", (string)null);
+                });
+
+            modelBuilder.Entity("Dictionary.Data.Models.PossibleTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Explanation")
                         .HasColumnType("text")
@@ -51,9 +77,6 @@ namespace Dictionary.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_possible_translations");
-
-                    b.HasIndex("Example")
-                        .HasDatabaseName("ix_possible_translations_example");
 
                     b.HasIndex("Explanation")
                         .HasDatabaseName("ix_possible_translations_explanation");
@@ -86,7 +109,7 @@ namespace Dictionary.Data.Migrations
                     b.ToTable("relations", (string)null);
                 });
 
-            modelBuilder.Entity("Dictionary.Data.Models.Word", b =>
+            modelBuilder.Entity("Word", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -94,6 +117,10 @@ namespace Dictionary.Data.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("LanguagePart")
+                        .HasColumnType("text")
+                        .HasColumnName("language_part");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -103,12 +130,34 @@ namespace Dictionary.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_words");
 
+                    b.HasIndex("LanguagePart")
+                        .HasDatabaseName("ix_words_language_part");
+
+                    b.HasIndex("Value")
+                        .HasDatabaseName("ix_words_value");
+
+                    b.HasIndex("LanguagePart", "Value")
+                        .IsUnique()
+                        .HasDatabaseName("ix_words_language_part_value");
+
                     b.ToTable("words", (string)null);
+                });
+
+            modelBuilder.Entity("Dictionary.Data.Models.Example", b =>
+                {
+                    b.HasOne("Dictionary.Data.Models.PossibleTranslation", "PossibleTranslation")
+                        .WithMany("Examples")
+                        .HasForeignKey("PossibleTranslationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_examples_possible_translations_possible_translation_id");
+
+                    b.Navigation("PossibleTranslation");
                 });
 
             modelBuilder.Entity("Dictionary.Data.Models.PossibleTranslation", b =>
                 {
-                    b.HasOne("Dictionary.Data.Models.Word", "Word")
+                    b.HasOne("Word", "Word")
                         .WithMany("PossibleTranslations")
                         .HasForeignKey("WordId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -120,14 +169,14 @@ namespace Dictionary.Data.Migrations
 
             modelBuilder.Entity("Dictionary.Data.Models.Relation", b =>
                 {
-                    b.HasOne("Dictionary.Data.Models.Word", "RelatedWord")
+                    b.HasOne("Word", "RelatedWord")
                         .WithMany("RelatedFromWords")
                         .HasForeignKey("RelatedWordId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_relations_words_related_word_id");
 
-                    b.HasOne("Dictionary.Data.Models.Word", "Word")
+                    b.HasOne("Word", "Word")
                         .WithMany("RelatedWords")
                         .HasForeignKey("WordId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -139,7 +188,12 @@ namespace Dictionary.Data.Migrations
                     b.Navigation("Word");
                 });
 
-            modelBuilder.Entity("Dictionary.Data.Models.Word", b =>
+            modelBuilder.Entity("Dictionary.Data.Models.PossibleTranslation", b =>
+                {
+                    b.Navigation("Examples");
+                });
+
+            modelBuilder.Entity("Word", b =>
                 {
                     b.Navigation("PossibleTranslations");
 

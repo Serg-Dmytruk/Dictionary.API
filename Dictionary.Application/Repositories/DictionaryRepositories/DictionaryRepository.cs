@@ -13,21 +13,22 @@ public class DictionaryRepository : IDictionaryRepository
         _db = db;
     }
 
-    public async Task<Models.Dictionaries.WordOut?> GetWordAsync(string value, CancellationToken cancellationToken)
+    public async Task<List<WordOut>> GetWordAsync(string value, CancellationToken cancellationToken)
     {
-        var word = await _db.Words
-            .Include(w => w.PossibleTranslations)
+        var words = await _db.Words
+            .Include(w => w.PossibleTranslations).ThenInclude(x => x.Examples)
             .Include(w => w.RelatedWords).ThenInclude(x => x.RelatedWord)
             .Include(w => w.RelatedFromWords).ThenInclude(x => x.Word)
             .AsNoTracking()
-            .SingleOrDefaultAsync(w => w.Value.ToLower() == value.ToLower(), cancellationToken);
-        
-        return word is null ? null : new Models.Dictionaries.WordOut
+            .Where(w => w.Value.ToLower() == value.ToLower()).ToListAsync(cancellationToken);
+
+        return words.Select(x => new WordOut
         {
-            Value = word.Value,
-            PossibleTranslations = word.PossibleTranslations,
-            RelatedWords = word.RelatedWords?.Select(x => x.RelatedWord.Value),
-            RelatedFromWords = word.RelatedFromWords?.Select(x => x.Word.Value)
-        };
+            Value = x.Value,
+            LanguagePart = x.LanguagePart,
+            PossibleTranslations = x.PossibleTranslations,
+            RelatedWords = x.RelatedWords.Select(c => c.RelatedWord.Value),
+            RelatedFromWords = x.RelatedFromWords.Select(p => p.Word.Value)
+        }).ToList();
     }
 }

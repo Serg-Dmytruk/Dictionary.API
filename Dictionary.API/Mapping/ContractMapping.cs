@@ -5,19 +5,20 @@ namespace Dictionary.API.Mapping;
 
 public static class ContractMapping
 {
-    public static WordResponse MapToWordResponse(this WordOut response)
+    public static List<WordResponse> MapToWordResponse(this IEnumerable<WordOut> response)
     {
-        return new WordResponse
+        return response.Select(x => new WordResponse
         {
-            Value = response.Value,
-            PossibleTranslations = response.PossibleTranslations?.Select(x => new PossibleTranslationResponse
+            Value = x.Value,
+            LanguagePart = x.LanguagePart,
+            PossibleTranslations = x.PossibleTranslations?.Select(p => new PossibleTranslationResponse
             {
-                Translation = x.Translation,
-                Explanation = x.Explanation,
-                Example = x.Example
+                Translation = p.Translation,
+                Explanation = p.Explanation,
+                Example = p.Examples?.Select(e => e.Value).ToList()
             }).ToList(),
-            RelatedWords = response.RelatedWords?.ToList(),
-            RelatedFromWords = response.RelatedFromWords?.ToList()
-        };
+            RelatedWords = x.RelatedWords?.ToList(),
+            RelatedFromWords = x.RelatedFromWords?.ToList()
+        }).ToList();
     }
 }

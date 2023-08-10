@@ -1,4 +1,5 @@
 ﻿using AngleSharp;
+using AngleSharp.Dom;
 using Dictionary.Application.Models.Parsers;
 using Microsoft.Extensions.Logging;
 
@@ -15,35 +16,60 @@ public class Layer4PageParser : PageParser
     {
         using var context = BrowsingContext.New(Config);
         using var document =
-            await context.OpenAsync($"{BaseUrl}{url}");
-
-        var elementEnWord = document.QuerySelector(".tw-bw.dhw.dpos-h_hw.di-title");
-        if (elementEnWord is null)
+            await context.OpenAsync(
+                $"{BaseUrl}{url}");
+        var elementEnWords = document.QuerySelectorAll(".link.dlink");
+        
+        if (elementEnWords.Length == 0)
         {
             Logger.LogError("Word not found! {BaseUrl}{Url}", BaseUrl, url);
             return new List<ParseResult> { new() { Source = url } };
         }
 
-        var parseResult = new ParseResult
+        var result = new List<ParseResult>();
+        var elementRelatedWords = document.QuerySelectorAll(".phrase").Select(x => x.TextContent);
+        
+        foreach (var htmlWordElement in elementEnWords)
         {
-            EnWord = elementEnWord.TextContent,
-            LanguagePart = document.QuerySelector(".pos.dpos")?.TextContent
-        };
-
-        var divPosibleTanslations = document.QuerySelectorAll(".def-block.ddef_block");
-        foreach (var div in divPosibleTanslations)
-        {
-            parseResult.PosibleTranslations.Add(new Translation
+            var enWord = htmlWordElement.QuerySelector(".tw-bw.dhw.dpos-h_hw.di-title")?.TextContent;
+            if (string.IsNullOrEmpty(enWord))
             {
-                Explanation = div.QuerySelector(".def.ddef_d.db")?.TextContent,
-                Interpretation = div.QuerySelector(".trans.dtrans")?.TextContent,
-                Example = div.QuerySelector(".eg.deg")?.TextContent
+                Logger.LogError("Word not found in div! {BaseUrl}{Url}", BaseUrl, url);
+                result.Add(new ParseResult { Source = url });
+                continue;
+            }
+
+            var parseResult = new ParseResult
+            {
+                EnWord = enWord,
+                LanguagePart = htmlWordElement.QuerySelector(".pos.dpos")?.TextContent
+            };
+
+            var divPosibleTanslations = htmlWordElement.QuerySelectorAll(".def-block.ddef_block");
+            parseResult.PosibleTranslations = divPosibleTanslations.Select(posibleTanslation => new Translation
+            {
+                Explanation = posibleTanslation.QuerySelector(".def.ddef_d.db")?.TextContent,
+                Interpretation = posibleTanslation.QuerySelector(".trans.dtrans")?.TextContent,
+                Examples = posibleTanslation.QuerySelectorAll(".eg.deg").Select(x => x.TextContent)
             });
+
+            foreach (var divPosibleTanslation in divPosibleTanslations)
+                divPosibleTanslation.RemoveFromParent();
+
+            parseResult.RelatedWords = elementRelatedWords ?? Enumerable.Empty<string>();
+            result.Add(parseResult);
+            htmlWordElement.RemoveFromParent();
         }
 
-        var elementRelatedWords = document.QuerySelectorAll(".phrase");
-        parseResult.RelatedWords = elementRelatedWords.Select(x => x.TextContent).ToList();
-        
-        return new List<ParseResult> { parseResult };
+        return result
+            .GroupBy(r => new { r.LanguagePart, r.EnWord })
+            .Select(group => new ParseResult
+            {
+                EnWord = group.Key.EnWord,
+                LanguagePart = group.Key.LanguagePart,
+                PosibleTranslations =
+                    group.SelectMany(r => r.PosibleTranslations),
+                RelatedWords = group.SelectMany(r => r.RelatedWords ?? Enumerable.Empty<string>())
+            }).ToList();
     }
 }

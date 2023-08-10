@@ -18,30 +18,24 @@ public class Layer2PageParser : PageParser
         {
             await Semaphore.WaitAsync();
             Logger.LogWarning("Start parse {Url}", url);
+            
             using var context = BrowsingContext.New(Config);
             using var document = await context.OpenAsync($"{BaseUrl}/{url}");
-
             var div = document.QuerySelector(".hdf.ff-50.lmt-15.i-browse");
-
+            
             if (div is null)
             {
                 Logger.LogWarning("End parse {Url}", url);
                 Semaphore.Release();
                 return Enumerable.Empty<ParseResult>();
             }
-
-            var links = div.QuerySelectorAll("a");
-            var hrefs = links.Select(a =>
+            
+            var hrefs = div.QuerySelectorAll("a").Select(a =>
                 a.GetAttribute("href"));
             
             var childParseTasks = CteateChildParsers(hrefs);
             var childParseResults = await Task.WhenAll(childParseTasks);
-
-            var parseResult = new List<ParseResult>();
-            foreach (var result in childParseResults)
-            {
-                parseResult.AddRange(result);
-            }
+            var parseResult = childParseResults.SelectMany(result => result);
             
             Logger.LogWarning("End parse {Url}", url);
             Semaphore.Release();
@@ -49,6 +43,7 @@ public class Layer2PageParser : PageParser
         }
         catch (Exception e)
         {
+            Semaphore.Release();
             Logger.LogWarning(e, "error ocured Layer2PageParser {Url}", url);
             return Enumerable.Empty<ParseResult>();
         }

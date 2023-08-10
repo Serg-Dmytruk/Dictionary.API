@@ -12,8 +12,8 @@ public class DictionaryService : IDictionaryService
         _dictionaryRepository = dictionaryRepository;
     }
     
-    public async Task<Models.Dictionaries.WordOut?> GetWordAsync(string request, CancellationToken cancellationToken)
+    public async Task<List<WordOut>> GetWordAsync(string request, CancellationToken cancellationToken)
     {
-        return await  _dictionaryRepository.GetWordAsync(request, cancellationToken);
+        return await _dictionaryRepository.GetWordAsync(request, cancellationToken);
     }
 }

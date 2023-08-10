@@ -4,5 +4,5 @@ namespace Dictionary.Application.Services.DictionaryServices;
 
 public interface IDictionaryService
 {
-    Task<Models.Dictionaries.WordOut?> GetWordAsync(string request, CancellationToken cancellationToken);
+    Task<List<WordOut>> GetWordAsync(string request, CancellationToken cancellationToken);
 }

@@ -26,6 +26,6 @@ public abstract class PageParser
         return (from href in hrefs
             let childParser = ParserFactory.CreatePageParser(_layer + 1, BaseUrl, Logger)
             where !string.IsNullOrEmpty(href)
-            select childParser.ParseAsync(href)).ToList();
+            select childParser.ParseAsync(href));
     }
 }

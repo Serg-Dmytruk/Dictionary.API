@@ -6,6 +6,6 @@ public class PossibleTranslation
     public int WordId { get; set; }
     public string? Explanation { get; set; }
     public string? Translation { get; set; }
-    public string? Example { get; set; }
+    public List<Example>? Examples { get; set; }
     public Word Word { get; set; } = null!;
 }
