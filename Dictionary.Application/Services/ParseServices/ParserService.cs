@@ -41,23 +41,23 @@ namespace Dictionary.Application.Services.ParseServices
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                //Посинаєм парсити
+                //Start parsing
                 var parser = ParserFactory.CreatePageParser(BaseLayer, _options.Value.BaseUrl, _parseLogger);
                 var parseResults = (await parser.ParseAsync("/dictionary/english-ukrainian")).ToList();
 
-                //Вибераємо ті слова де парс видав помилку через нагрузку
+                //Select the words where the parser gave an error due to the load
                 var failedPages = parseResults.Where(x => !string.IsNullOrEmpty(x.Source)).ToList();
-                _parseLogger.LogWarning("Number fail results : {Count}", failedPages.Count());
+                _parseLogger.LogWarning("Number fail results : {Count}", failedPages.Count);
 
                 var failedTask = (from failPage in failedPages
                     let wordParser = ParserFactory.CreatePageParser(WordLevel, _options.Value.BaseUrl, _parseLogger)
                     select wordParser.ParseAsync(failPage.Source!)).ToList();
 
-                //Парсимо повторно і докідаємо результат до решти
+                //Parsing again and adding the result to the rest
                 var secondTryResults = await Task.WhenAll(failedTask);
                 parseResults.AddRange(secondTryResults.SelectMany(result => result));
 
-                //Приводимо до моделі в бд і відкидаємо провальні результати парсингу
+                //Converting to a database model and discarding failed parsing results
                 var dictionary = parseResults.Where(x => !string.IsNullOrEmpty(x.EnWord)).Select(x => new Word
                 {
                     Value = x.EnWord,
@@ -79,7 +79,7 @@ namespace Dictionary.Application.Services.ParseServices
                 await using var transaction = await db.Database.BeginTransactionAsync(stoppingToken);
                 var dictionaryRepository = scope.ServiceProvider.GetRequiredService<IParserRepository>();
 
-                //вибераємо на добавлення в базу ті слова яких нема в базі
+                //Select the words that are not in the database to be added to the database
                 var uniqueWords = await dictionaryRepository.GetUniqueRecords(dictionary, db.Database.GetDbConnection(),
                     db.Database.CurrentTransaction?.GetDbTransaction());
                 dictionary = dictionary.Where(x => uniqueWords.Contains(x.Value)).ToList();
