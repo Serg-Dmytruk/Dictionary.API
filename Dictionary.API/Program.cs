@@ -15,7 +15,6 @@ var logger = new LoggerConfiguration().WriteTo.Console(LogEventLevel.Warning)
         LogEventLevel.Warning, rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
-// Add services to the container.
 builder.Logging.AddSerilog(logger);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -30,7 +29,6 @@ builder.Services.Configure<ParserOptions>(builder.Configuration.GetSection("Pars
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>11</LangVersion>
         <TargetFrameworks>net5.0;net6.0;net7.0</TargetFrameworks>
+        <RootNamespace>Dictionary.Contacts</RootNamespace>
     </PropertyGroup>
 
 </Project>

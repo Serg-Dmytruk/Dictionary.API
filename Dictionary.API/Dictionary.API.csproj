@@ -17,7 +17,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Dictionary.Application\Dictionary.Application.csproj" />
-      <ProjectReference Include="..\Dictionary.Contacts\Dictionary.Contacts.csproj" />
+      <ProjectReference Include="..\Dictionary.Contracts\Dictionary.Contracts.csproj" />
     </ItemGroup>
 
 </Project>
